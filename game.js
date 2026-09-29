@@ -6,6 +6,7 @@ const ctx = canvas.getContext('2d');
 
 const BRICK = { rows: 5, cols: 10, width: 70, height: 20, gap: 6, offsetTop: 60 };
 const POINTS_PER_BRICK = 10;
+const INITIAL_LIVES = 3;
 const BRICK_COLORS = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#3498db'];
 
 function createBricks() {
@@ -30,6 +31,7 @@ function createBricks() {
 const state = {
   phase: 'ready',
   score: 0,
+  lives: INITIAL_LIVES,
   paddle: {
     x: (CANVAS.width - 100) / 2,
     y: CANVAS.height - 40,
@@ -126,6 +128,17 @@ function moveBall(dt) {
 
   bounceOnPaddle();
   bounceOnBricks();
+
+  if (ball.y - ball.radius > CANVAS.height) loseLife();
+}
+
+function loseLife() {
+  const { ball } = state;
+  state.lives -= 1;
+  ball.vx = 0;
+  ball.vy = 0;
+  state.phase = state.lives > 0 ? 'ready' : 'lost';
+  if (state.phase === 'ready') stickBallToPaddle();
 }
 
 function bounceOnBricks() {
