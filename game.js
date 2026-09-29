@@ -98,9 +98,21 @@ function restartGame() {
   stickBallToPaddle();
 }
 
-// Un solo gesto por evento: según la fase lanza o reinicia, nunca ambos
+function nextLevel() {
+  state.level += 1;
+  state.bricks = createBricks(state.level - 1);
+  state.explosions = [];
+  state.ball.speed = LEVELS[state.level - 1].ballSpeed;
+  state.ball.vx = 0;
+  state.ball.vy = 0;
+  state.phase = 'ready';
+  stickBallToPaddle();
+}
+
+// Un solo gesto por evento: según la fase lanza, avanza de nivel o reinicia, nunca varios
 function handleAction() {
   if (state.phase === 'ready') launchBall();
+  else if (state.phase === 'levelComplete') nextLevel();
   else if (state.phase === 'won' || state.phase === 'lost') restartGame();
 }
 
@@ -183,7 +195,7 @@ function moveBall(dt) {
   if (state.bricks.every((b) => !b.alive)) {
     ball.vx = 0;
     ball.vy = 0;
-    state.phase = 'won';
+    state.phase = state.level < LEVELS.length ? 'levelComplete' : 'won';
     return;
   }
 
@@ -276,7 +288,21 @@ function draw() {
   drawSprite(ctx, 'ball', ball.x - ball.radius, ball.y - ball.radius, ball.radius * 2, ball.radius * 2);
 
   drawHud();
-  if (state.phase === 'won' || state.phase === 'lost') drawOverlay();
+  if (state.phase === 'levelComplete') drawLevelCompleteOverlay();
+  else if (state.phase === 'won' || state.phase === 'lost') drawOverlay();
+}
+
+function drawLevelCompleteOverlay() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect(0, 0, CANVAS.width, CANVAS.height);
+
+  ctx.fillStyle = '#eee';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 48px sans-serif';
+  ctx.fillText('Nivel completado', CANVAS.width / 2, CANVAS.height / 2 - 20);
+  ctx.font = '18px sans-serif';
+  ctx.fillText('Espacio o click para continuar', CANVAS.width / 2, CANVAS.height / 2 + 30);
 }
 
 function drawOverlay() {
