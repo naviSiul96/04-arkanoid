@@ -234,6 +234,11 @@ function draw() {
     drawSprite(ctx, `block_${brick.color}`, brick.x, brick.y, brick.width, brick.height);
   }
 
+  for (const explosion of state.explosions) {
+    const frame = Math.min(3, Math.floor(((explosion.elapsed * 1000) / EXPLOSION_DURATION) * 4));
+    drawFrame(ctx, EXPLOSION_FRAMES[explosion.color][frame], explosion.x, explosion.y, explosion.width, explosion.height);
+  }
+
   const { paddle } = state;
   drawSprite(ctx, 'paddle', paddle.x, paddle.y, paddle.width, paddle.height);
 
