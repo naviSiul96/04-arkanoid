@@ -14,7 +14,7 @@ const state = {
   },
 };
 
-const input = { left: false, right: false };
+const input = { left: false, right: false, mouseX: null, last: 'keys' };
 
 const KEY_MAP = {
   ArrowLeft: 'left',
@@ -27,6 +27,7 @@ window.addEventListener('keydown', (e) => {
   const dir = KEY_MAP[e.code];
   if (!dir) return;
   input[dir] = true;
+  input.last = 'keys';
   e.preventDefault();
 });
 
@@ -36,12 +37,22 @@ window.addEventListener('keyup', (e) => {
   input[dir] = false;
 });
 
+canvas.addEventListener('mousemove', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  input.mouseX = (e.clientX - rect.left) * (CANVAS.width / rect.width);
+  input.last = 'mouse';
+});
+
 let lastTime = null;
 
 function update(dt) {
   const { paddle } = state;
-  const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-  paddle.x += dir * paddle.speed * dt;
+  if (input.last === 'mouse' && input.mouseX !== null) {
+    paddle.x = input.mouseX - paddle.width / 2;
+  } else {
+    const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+    paddle.x += dir * paddle.speed * dt;
+  }
   paddle.x = Math.max(0, Math.min(CANVAS.width - paddle.width, paddle.x));
 }
 
