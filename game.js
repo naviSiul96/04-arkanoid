@@ -4,6 +4,28 @@ const MAX_DT = 1 / 30;
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
+const BRICK = { rows: 5, cols: 10, width: 70, height: 20, gap: 6, offsetTop: 60 };
+const BRICK_COLORS = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#3498db'];
+
+function createBricks() {
+  const totalWidth = BRICK.cols * BRICK.width + (BRICK.cols - 1) * BRICK.gap;
+  const offsetLeft = (CANVAS.width - totalWidth) / 2;
+  const bricks = [];
+  for (let row = 0; row < BRICK.rows; row++) {
+    for (let col = 0; col < BRICK.cols; col++) {
+      bricks.push({
+        x: offsetLeft + col * (BRICK.width + BRICK.gap),
+        y: BRICK.offsetTop + row * (BRICK.height + BRICK.gap),
+        width: BRICK.width,
+        height: BRICK.height,
+        row,
+        alive: true,
+      });
+    }
+  }
+  return bricks;
+}
+
 const state = {
   phase: 'ready',
   paddle: {
@@ -14,6 +36,7 @@ const state = {
     speed: 600,
   },
   ball: { x: 0, y: 0, radius: 8, vx: 0, vy: 0, speed: 350 },
+  bricks: createBricks(),
 };
 
 function stickBallToPaddle() {
@@ -126,6 +149,12 @@ function bounceOnPaddle() {
 function draw() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, CANVAS.width, CANVAS.height);
+
+  for (const brick of state.bricks) {
+    if (!brick.alive) continue;
+    ctx.fillStyle = BRICK_COLORS[brick.row % BRICK_COLORS.length];
+    ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+  }
 
   const { paddle } = state;
   ctx.fillStyle = '#eee';
