@@ -78,6 +78,26 @@ function update(dt) {
   paddle.x = Math.max(0, Math.min(CANVAS.width - paddle.width, paddle.x));
 
   if (state.phase === 'ready') stickBallToPaddle();
+  if (state.phase === 'playing') moveBall(dt);
+}
+
+function moveBall(dt) {
+  const { ball } = state;
+  ball.x += ball.vx * dt;
+  ball.y += ball.vy * dt;
+
+  if (ball.x - ball.radius < 0) {
+    ball.x = ball.radius;
+    ball.vx = Math.abs(ball.vx);
+  } else if (ball.x + ball.radius > CANVAS.width) {
+    ball.x = CANVAS.width - ball.radius;
+    ball.vx = -Math.abs(ball.vx);
+  }
+
+  if (ball.y - ball.radius < 0) {
+    ball.y = ball.radius;
+    ball.vy = Math.abs(ball.vy);
+  }
 }
 
 function draw() {
