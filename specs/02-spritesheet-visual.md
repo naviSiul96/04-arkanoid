@@ -1,6 +1,6 @@
 # SPEC 02 — Arte del juego con el spritesheet
 
-> **Estado:** aprobado
+> **Estado:** implementado
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-09-29
 > **Objetivo:** Cambiar solo lo visual: dibujar la paleta, la pelota y los ladrillos con `assets/spritesheet-breakout.png` sin tocar la jugabilidad ni agregar audio.
