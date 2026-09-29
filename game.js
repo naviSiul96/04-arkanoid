@@ -98,6 +98,29 @@ function moveBall(dt) {
     ball.y = ball.radius;
     ball.vy = Math.abs(ball.vy);
   }
+
+  bounceOnPaddle();
+}
+
+const MAX_BOUNCE_ANGLE = (60 * Math.PI) / 180;
+
+function bounceOnPaddle() {
+  const { ball, paddle } = state;
+  if (ball.vy <= 0) return;
+
+  const hits =
+    ball.x + ball.radius > paddle.x &&
+    ball.x - ball.radius < paddle.x + paddle.width &&
+    ball.y + ball.radius >= paddle.y &&
+    ball.y - ball.radius <= paddle.y + paddle.height;
+  if (!hits) return;
+
+  const center = paddle.x + paddle.width / 2;
+  const offset = Math.max(-1, Math.min(1, (ball.x - center) / (paddle.width / 2)));
+  const angle = offset * MAX_BOUNCE_ANGLE;
+  ball.vx = ball.speed * Math.sin(angle);
+  ball.vy = -ball.speed * Math.cos(angle);
+  ball.y = paddle.y - ball.radius;
 }
 
 function draw() {
