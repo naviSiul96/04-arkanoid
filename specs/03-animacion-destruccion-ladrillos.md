@@ -1,6 +1,6 @@
 # SPEC 03 — Animación de destrucción de ladrillos
 
-> **Estado:** borrador
+> **Estado:** Aprobado
 > **Depende de:** SPEC 01, SPEC 02
 > **Fecha:** 2026-09-29
 > **Objetivo:** Mostrar una animación de explosión de 4 frames y 150 ms en la posición de cada ladrillo destruido, sin cambiar la jugabilidad ni agregar audio.

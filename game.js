@@ -41,6 +41,7 @@ const state = {
   },
   ball: { x: 0, y: 0, radius: 8, vx: 0, vy: 0, speed: 350 },
   bricks: createBricks(),
+  explosions: [],
 };
 
 function stickBallToPaddle() {
@@ -60,6 +61,7 @@ function restartGame() {
   state.score = 0;
   state.lives = INITIAL_LIVES;
   state.bricks = createBricks();
+  state.explosions = [];
   state.ball.vx = 0;
   state.ball.vy = 0;
   state.phase = 'ready';
