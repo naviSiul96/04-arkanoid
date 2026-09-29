@@ -11,6 +11,7 @@
 
 - 3 niveles, cada uno con su propio layout de ladrillos (grilla de hasta 5x10, mismo tamaño 70x20 y gap 6) y velocidad de pelota propia (350 / 400 / 450).
 - Nueva fase `levelComplete`: al romper el último ladrillo de un nivel que no es el último, aparece el overlay "Nivel completado"; Espacio o click cargan el siguiente nivel con la pelota pegada a la paleta.
+- Configuración de niveles (`LEVELS`) en un archivo aparte, `levels.js`, cargado antes de `game.js`, para editar layouts y velocidades sin tocar la lógica del juego.
 - Puntaje y vidas se conservan entre niveles.
 - Pausa con la tecla `P` (toggle), disponible solo en las fases `ready` y `playing`. Congela paleta, pelota y explosiones, y muestra un overlay "Pausa".
 - Selección manual de nivel desde la pausa con las teclas `1`, `2` y `3`, para probar los niveles sin jugarlos completos. El overlay de pausa lista las opciones.
@@ -43,7 +44,10 @@
 
 Los layouts son matrices de texto: `#` = ladrillo, `.` = vacío; 10 columnas por fila y hasta 5 filas. El color sigue saliendo de la fila con `BRICK_ROW_COLORS` (SPEC 02).
 
+`LEVELS` vive en `levels.js` (script clásico, no ES module, para que funcione con `file://`). `index.html` lo carga entre `assets/spritesheet.js` y `game.js`; `game.js` solo lo lee y no lo define. `SOUND_FILES`, `state` y el resto viven en `game.js`.
+
 ```js
+// levels.js
 const LEVELS = [
   { ballSpeed: 350, layout: [
     '##########',
@@ -68,6 +72,7 @@ const LEVELS = [
   ] },
 ];
 
+// game.js
 const SOUND_FILES = {
   bounce: 'assets/sounds/ball-bounce.mp3',
   break: 'assets/sounds/break-sound.mp3',
@@ -100,18 +105,19 @@ Reglas:
 
 ## Plan de implementación
 
-1. Agregar `LEVELS` y `state.level`, y que `createBricks(levelIndex)` use el layout; `restartGame` fija `level = 1` y `ball.speed` del nivel 1. Verificación: el juego se ve y juega igual que antes (layout completo, velocidad 350), sin errores en consola.
+1. Agregar `LEVELS` en `levels.js` (cargado en `index.html` antes de `game.js`) y `state.level`, y que `createBricks(levelIndex)` use el layout; `restartGame` fija `level = 1` y `ball.speed` del nivel 1. Verificación: el juego se ve y juega igual que antes (layout completo, velocidad 350), sin errores en consola.
 2. Agregar la fase `levelComplete`: transición en `moveBall`, avance en `handleAction` y overlay "Nivel completado / Espacio o click para continuar". Verificación: al vaciar el nivel 1 aparece el overlay y, al continuar, se ve el layout y la velocidad del nivel 2, con puntaje y vidas intactos.
 3. Mostrar "Nivel N" en el HUD (centrado, mismo estilo). Verificación: el número cambia al avanzar y vuelve a 1 al reiniciar.
 4. Agregar `state.paused`, el toggle con `P` (solo en `ready` y `playing`), el corte en `update(dt)` y `handleAction`, y el overlay "Pausa". Verificación: `P` congela pelota, paleta y explosiones, y otra `P` reanuda igual.
 5. Agregar `goToLevel(n)` y las teclas `1`, `2`, `3` activas solo en pausa, y listar las opciones en el overlay de pausa. Verificación: desde la pausa, `2` carga la pirámide a velocidad 400 con puntaje y vidas intactos, y `3` el damero.
 6. Agregar `SOUND_FILES` y `playSound`, y llamar `playSound('break')` al destruir un ladrillo en `bounceOnBricks`. Verificación: suena al romper; varios ladrillos seguidos pueden solaparse.
 7. Llamar `playSound('bounce')` en los rebotes contra paredes, techo y paleta. Verificación: suena en cada rebote y no al golpear ladrillos.
-8. Actualizar `CLAUDE.md`: niveles (`LEVELS`, fase `levelComplete`), pausa y selección de nivel (`P`, `1`/`2`/`3`), y audio (`playSound`); quitar la nota de que los sonidos no se usan.
+8. Actualizar `CLAUDE.md`: niveles (`levels.js` con `LEVELS`, fase `levelComplete`), pausa y selección de nivel (`P`, `1`/`2`/`3`), y audio (`playSound`); quitar la nota de que los sonidos no se usan.
 
 ## Criterios de aceptación
 
 - [ ] Abrir `index.html` sin servidor muestra el juego sin errores en la consola.
+- [ ] Los niveles se definen en `levels.js`; editar ahí un layout o una velocidad cambia el juego sin tocar `game.js`.
 - [ ] El nivel 1 tiene 50 ladrillos (5x10), el nivel 2 una pirámide de 30 y el nivel 3 un damero de 25.
 - [ ] La velocidad de la pelota es 350, 400 y 450 en los niveles 1, 2 y 3.
 - [ ] Al romper el último ladrillo de los niveles 1 y 2 aparece "Nivel completado" al instante y la última explosión se anima debajo.
@@ -143,6 +149,8 @@ Reglas:
 - **Sí:** 3 niveles con layouts distintos. Aporta variedad sin cambiar tamaños ni colisiones.
 - **No:** 5 niveles ni niveles con más dificultad solo por velocidad. Se descartó por tamaño de la spec.
 - **Sí:** layouts como matrices de texto en `LEVELS`. Se leen y editan a simple vista.
+- **Sí:** `LEVELS` en `levels.js`, aparte de `game.js`. Permite configurar niveles sin tocar la lógica; script clásico para seguir funcionando con `file://`.
+- **No:** JSON o `fetch` para los niveles. `fetch` falla con `file://`.
 - **Sí:** velocidad 350 / 400 / 450. Sube la dificultad tocando solo `ball.speed`.
 - **Sí:** overlay "Nivel completado" con continuación manual. Da una pausa entre niveles y reutiliza el patrón de fases y `handleAction`.
 - **No:** pasar directo al siguiente nivel sin overlay. Deja al jugador sin aviso con la pelota ya en la paleta.

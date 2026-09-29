@@ -9,31 +9,7 @@ const POINTS_PER_BRICK = 10;
 const INITIAL_LIVES = 3;
 const BRICK_ROW_COLORS = ['red', 'yellow', 'green', 'cyan', 'magenta']; // de arriba hacia abajo
 
-// '#' = ladrillo, '.' = vacío; 10 columnas por fila, hasta 5 filas
-const LEVELS = [
-  { ballSpeed: 350, layout: [
-    '##########',
-    '##########',
-    '##########',
-    '##########',
-    '##########',
-  ] },
-  { ballSpeed: 400, layout: [
-    '....##....',
-    '...####...',
-    '..######..',
-    '.########.',
-    '##########',
-  ] },
-  { ballSpeed: 450, layout: [
-    '#.#.#.#.#.',
-    '.#.#.#.#.#',
-    '#.#.#.#.#.',
-    '.#.#.#.#.#',
-    '#.#.#.#.#.',
-  ] },
-];
-
+// LEVELS viene de levels.js
 function createBricks(levelIndex) {
   const { layout } = LEVELS[levelIndex];
   const totalWidth = BRICK.cols * BRICK.width + (BRICK.cols - 1) * BRICK.gap;
