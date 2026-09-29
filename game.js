@@ -5,6 +5,7 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
 const BRICK = { rows: 5, cols: 10, width: 70, height: 20, gap: 6, offsetTop: 60 };
+const POINTS_PER_BRICK = 10;
 const BRICK_COLORS = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#3498db'];
 
 function createBricks() {
@@ -28,6 +29,7 @@ function createBricks() {
 
 const state = {
   phase: 'ready',
+  score: 0,
   paddle: {
     x: (CANVAS.width - 100) / 2,
     y: CANVAS.height - 40,
@@ -123,6 +125,33 @@ function moveBall(dt) {
   }
 
   bounceOnPaddle();
+  bounceOnBricks();
+}
+
+function bounceOnBricks() {
+  const { ball } = state;
+  for (const brick of state.bricks) {
+    if (!brick.alive) continue;
+
+    const nearestX = Math.max(brick.x, Math.min(ball.x, brick.x + brick.width));
+    const nearestY = Math.max(brick.y, Math.min(ball.y, brick.y + brick.height));
+    const dx = ball.x - nearestX;
+    const dy = ball.y - nearestY;
+    if (dx * dx + dy * dy >= ball.radius * ball.radius) continue;
+
+    brick.alive = false;
+    state.score += POINTS_PER_BRICK;
+
+    // Rebota por el eje con menor penetración
+    const overlapX = Math.min(ball.x + ball.radius - brick.x, brick.x + brick.width - (ball.x - ball.radius));
+    const overlapY = Math.min(ball.y + ball.radius - brick.y, brick.y + brick.height - (ball.y - ball.radius));
+    if (overlapX < overlapY) {
+      ball.vx = -ball.vx;
+    } else {
+      ball.vy = -ball.vy;
+    }
+    break;
+  }
 }
 
 const MAX_BOUNCE_ANGLE = (60 * Math.PI) / 180;
