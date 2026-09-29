@@ -122,6 +122,9 @@ function update(dt) {
   }
   paddle.x = Math.max(0, Math.min(CANVAS.width - paddle.width, paddle.x));
 
+  for (const explosion of state.explosions) explosion.elapsed += dt;
+  state.explosions = state.explosions.filter((e) => e.elapsed * 1000 < EXPLOSION_DURATION);
+
   if (state.phase === 'ready') stickBallToPaddle();
   if (state.phase === 'playing') moveBall(dt);
 }
