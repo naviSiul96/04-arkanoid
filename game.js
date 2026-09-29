@@ -193,14 +193,17 @@ function moveBall(dt) {
   if (ball.x - ball.radius < 0) {
     ball.x = ball.radius;
     ball.vx = Math.abs(ball.vx);
+    playSound('bounce');
   } else if (ball.x + ball.radius > CANVAS.width) {
     ball.x = CANVAS.width - ball.radius;
     ball.vx = -Math.abs(ball.vx);
+    playSound('bounce');
   }
 
   if (ball.y - ball.radius < 0) {
     ball.y = ball.radius;
     ball.vy = Math.abs(ball.vy);
+    playSound('bounce');
   }
 
   bounceOnPaddle();
@@ -279,6 +282,7 @@ function bounceOnPaddle() {
   ball.vx = ball.speed * Math.sin(angle);
   ball.vy = -ball.speed * Math.cos(angle);
   ball.y = paddle.y - ball.radius;
+  playSound('bounce');
 }
 
 function draw() {
