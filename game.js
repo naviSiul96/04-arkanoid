@@ -206,6 +206,18 @@ function draw() {
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
   ctx.fill();
+
+  drawHud();
+}
+
+function drawHud() {
+  ctx.fillStyle = '#eee';
+  ctx.font = '20px sans-serif';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  ctx.fillText(`Puntaje: ${state.score}`, 20, 30);
+  ctx.textAlign = 'right';
+  ctx.fillText(`Vidas: ${state.lives}`, CANVAS.width - 20, 30);
 }
 
 function loop(time) {
