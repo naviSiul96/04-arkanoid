@@ -7,7 +7,7 @@ const ctx = canvas.getContext('2d');
 const BRICK = { rows: 5, cols: 10, width: 70, height: 20, gap: 6, offsetTop: 60 };
 const POINTS_PER_BRICK = 10;
 const INITIAL_LIVES = 3;
-const BRICK_COLORS = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#3498db'];
+const BRICK_ROW_COLORS = ['red', 'yellow', 'green', 'cyan', 'magenta']; // de arriba hacia abajo
 
 function createBricks() {
   const totalWidth = BRICK.cols * BRICK.width + (BRICK.cols - 1) * BRICK.gap;
@@ -20,7 +20,7 @@ function createBricks() {
         y: BRICK.offsetTop + row * (BRICK.height + BRICK.gap),
         width: BRICK.width,
         height: BRICK.height,
-        row,
+        color: BRICK_ROW_COLORS[row % BRICK_ROW_COLORS.length],
         alive: true,
       });
     }
@@ -215,20 +215,17 @@ function draw() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, CANVAS.width, CANVAS.height);
 
+  ctx.imageSmoothingEnabled = false;
   for (const brick of state.bricks) {
     if (!brick.alive) continue;
-    ctx.fillStyle = BRICK_COLORS[brick.row % BRICK_COLORS.length];
-    ctx.fillRect(brick.x, brick.y, brick.width, brick.height);
+    drawSprite(ctx, `block_${brick.color}`, brick.x, brick.y, brick.width, brick.height);
   }
 
   const { paddle } = state;
-  ctx.fillStyle = '#eee';
-  ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+  drawSprite(ctx, 'paddle', paddle.x, paddle.y, paddle.width, paddle.height);
 
   const { ball } = state;
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-  ctx.fill();
+  drawSprite(ctx, 'ball', ball.x - ball.radius, ball.y - ball.radius, ball.radius * 2, ball.radius * 2);
 
   drawHud();
   if (state.phase === 'won' || state.phase === 'lost') drawOverlay();
@@ -268,4 +265,4 @@ function loop(time) {
   requestAnimationFrame(loop);
 }
 
-requestAnimationFrame(loop);
+loadSpritesheet(() => requestAnimationFrame(loop));

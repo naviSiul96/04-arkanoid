@@ -4,7 +4,21 @@ Este archivo da guía a Claude Code (claude.ai/code) al trabajar con código en 
 
 ## Estado del proyecto
 
-Este repositorio actualmente no tiene código de aplicación — sin `package.json`, sin archivos fuente, sin carpeta `specs/` todavía, y todavía no es un repo git. El único contenido es un flujo de desarrollo dirigido por specs importado mediante dos skills (registradas en `skills-lock.json`, provenientes de `Klerith/fernando-skills`). La intención (según el nombre del repo) es un juego estilo Arkanoid, pero todavía no se eligió framework, lenguaje ni herramientas — no asumas ninguno.
+Arkanoid de un solo nivel, jugable en el navegador, hecho con HTML + Canvas + JS vanilla (spec 01, `specs/01-mvp-arkanoid-jugable.md`). Sin framework, bundler, `package.json` ni tests. El flujo de desarrollo dirigido por specs viene de dos skills (registradas en `skills-lock.json`, provenientes de `Klerith/fernando-skills`).
+
+### Estructura de archivos
+
+- `index.html` — página con el `<canvas id="game">` (800x600); carga `style.css`, `assets/spritesheet.js` y `game.js` (en ese orden).
+- `style.css` — centra el canvas sobre fondo oscuro.
+- `game.js` — todo el juego: constantes, `state`, `input`, loop `requestAnimationFrame` con `dt` en segundos (acotado a 1/30 s), física, colisiones, HUD y overlays. Es un script clásico (no ES module) para que funcione con `file://`.
+- `assets/spritesheet-breakout.png` y `assets/spritesheet.js` — spritesheet y su API (`loadSpritesheet`, `drawSprite`, `drawFrame`, `SPRITES`). El juego dibuja paleta, pelota y ladrillos con esos sprites, escalados a las hitboxes (paleta 100x14, ladrillos 70x20, pelota 16x16). El loop arranca recién cuando el PNG cargó. `spritesheet.js` no se modifica.
+- `assets/sounds/` — `ball-bounce.mp3` y `break-sound.mp3`; todavía no se usan (no hay audio).
+
+### Cómo ejecutar
+
+Abrir `index.html` directamente en el navegador. No hace falta servidor.
+
+Controles: ← → / A D o mouse para mover la paleta; Espacio o click para lanzar la pelota y reiniciar desde el overlay.
 
 ## Flujo de trabajo: desarrollo dirigido por specs
 
@@ -21,6 +35,6 @@ Reglas clave incorporadas en estas skills que también aplican a cualquier traba
 - La creación automática de rama en `/spec-impl` se controla con `specs/.spec-config.yml` (`AutoCreateBranch: true` por defecto), sembrado automáticamente por `/spec` la primera vez que guarda una spec.
 - Si la intención de una spec es ambigua durante la implementación, hay que detenerse y preguntar en vez de improvisar — es una regla dura en `spec-impl/SKILL.md`.
 
-## Todavía no hay comandos de build/test/lint
+## Sin comandos de build/test/lint
 
-No hay código de aplicación, así que no hay comandos de build, lint o test para ejecutar. Una vez que se implemente la primera spec, este archivo debe actualizarse con los comandos reales que se introduzcan en ese momento (p. ej. `npm run dev`, `npm test`) — revisar primero `specs/01-*.md` y cualquier `package.json`/archivo de configuración nuevo, ya que reflejarán las decisiones reales tomadas mediante el proceso de specs en vez de suposiciones hechas acá.
+No hay build, lint ni tests automatizados (fuera de alcance de la spec 01). Si una spec futura los introduce, actualizar esta sección con los comandos reales.
