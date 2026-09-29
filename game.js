@@ -4,13 +4,54 @@ const MAX_DT = 1 / 30;
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
+const state = {
+  paddle: {
+    x: (CANVAS.width - 100) / 2,
+    y: CANVAS.height - 40,
+    width: 100,
+    height: 14,
+    speed: 600,
+  },
+};
+
+const input = { left: false, right: false };
+
+const KEY_MAP = {
+  ArrowLeft: 'left',
+  KeyA: 'left',
+  ArrowRight: 'right',
+  KeyD: 'right',
+};
+
+window.addEventListener('keydown', (e) => {
+  const dir = KEY_MAP[e.code];
+  if (!dir) return;
+  input[dir] = true;
+  e.preventDefault();
+});
+
+window.addEventListener('keyup', (e) => {
+  const dir = KEY_MAP[e.code];
+  if (!dir) return;
+  input[dir] = false;
+});
+
 let lastTime = null;
 
-function update(dt) {}
+function update(dt) {
+  const { paddle } = state;
+  const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+  paddle.x += dir * paddle.speed * dt;
+  paddle.x = Math.max(0, Math.min(CANVAS.width - paddle.width, paddle.x));
+}
 
 function draw() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, CANVAS.width, CANVAS.height);
+
+  const { paddle } = state;
+  ctx.fillStyle = '#eee';
+  ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 }
 
 function loop(time) {
