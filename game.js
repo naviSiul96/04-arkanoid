@@ -76,15 +76,21 @@ function restartGame() {
   stickBallToPaddle();
 }
 
-function nextLevel() {
-  state.level += 1;
-  state.bricks = createBricks(state.level - 1);
+// Carga el nivel n (1..LEVELS.length) conservando puntaje y vidas
+function goToLevel(n) {
+  state.level = n;
+  state.bricks = createBricks(n - 1);
   state.explosions = [];
-  state.ball.speed = LEVELS[state.level - 1].ballSpeed;
+  state.ball.speed = LEVELS[n - 1].ballSpeed;
   state.ball.vx = 0;
   state.ball.vy = 0;
   state.phase = 'ready';
+  state.paused = false;
   stickBallToPaddle();
+}
+
+function nextLevel() {
+  goToLevel(state.level + 1);
 }
 
 // Un solo gesto por evento: según la fase lanza, avanza de nivel o reinicia, nunca varios
@@ -118,6 +124,12 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.code === 'KeyP') {
     if (!e.repeat) togglePause();
+    return;
+  }
+  const levelKey = /^Digit([1-9])$/.exec(e.code);
+  if (levelKey) {
+    const n = Number(levelKey[1]);
+    if (state.paused && n <= LEVELS.length) goToLevel(n);
     return;
   }
   const dir = KEY_MAP[e.code];
@@ -294,6 +306,11 @@ function drawPauseOverlay() {
   ctx.fillText('Pausa', CANVAS.width / 2, CANVAS.height / 2 - 20);
   ctx.font = '18px sans-serif';
   ctx.fillText('P para continuar', CANVAS.width / 2, CANVAS.height / 2 + 30);
+  ctx.fillText(
+    LEVELS.map((_, i) => `${i + 1}: Nivel ${i + 1}`).join('   '),
+    CANVAS.width / 2,
+    CANVAS.height / 2 + 65,
+  );
 }
 
 function drawLevelCompleteOverlay() {
