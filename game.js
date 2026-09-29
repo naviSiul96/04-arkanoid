@@ -326,6 +326,8 @@ function drawHud() {
   ctx.textBaseline = 'middle';
   ctx.textAlign = 'left';
   ctx.fillText(`Puntaje: ${state.score}`, 20, 30);
+  ctx.textAlign = 'center';
+  ctx.fillText(`Nivel ${state.level}`, CANVAS.width / 2, 30);
   ctx.textAlign = 'right';
   ctx.fillText(`Vidas: ${state.lives}`, CANVAS.width - 20, 30);
 }
