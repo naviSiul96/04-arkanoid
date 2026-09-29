@@ -12,6 +12,7 @@ Arkanoid de un solo nivel, jugable en el navegador, hecho con HTML + Canvas + JS
 - `style.css` — centra el canvas sobre fondo oscuro.
 - `game.js` — todo el juego: constantes, `state`, `input`, loop `requestAnimationFrame` con `dt` en segundos (acotado a 1/30 s), física, colisiones, HUD y overlays. Es un script clásico (no ES module) para que funcione con `file://`.
 - `assets/spritesheet-breakout.png` y `assets/spritesheet.js` — spritesheet y su API (`loadSpritesheet`, `drawSprite`, `drawFrame`, `SPRITES`). El juego dibuja paleta, pelota y ladrillos con esos sprites, escalados a las hitboxes (paleta 100x14, ladrillos 70x20, pelota 16x16). El loop arranca recién cuando el PNG cargó. `spritesheet.js` no se modifica.
+- Explosiones (spec 03): al destruir un ladrillo, `bounceOnBricks` agrega una entrada a `state.explosions` (`{ x, y, width, height, color, elapsed }`). `update(dt)` suma `dt` a `elapsed` y descarta las que superan `EXPLOSION_DURATION` (150 ms, en ms; `elapsed` en segundos), en cualquier `phase`. `draw()` las dibuja con `drawFrame` y `EXPLOSION_FRAMES[color]` (4 frames, escalados a 70x20) entre los ladrillos y la paleta. Son solo visuales: no afectan colisiones, puntaje ni fase. `restartGame` las vacía.
 - `assets/sounds/` — `ball-bounce.mp3` y `break-sound.mp3`; todavía no se usan (no hay audio).
 
 ### Cómo ejecutar
