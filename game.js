@@ -56,6 +56,22 @@ function launchBall() {
   state.ball.vy = -state.ball.speed;
 }
 
+function restartGame() {
+  state.score = 0;
+  state.lives = INITIAL_LIVES;
+  state.bricks = createBricks();
+  state.ball.vx = 0;
+  state.ball.vy = 0;
+  state.phase = 'ready';
+  stickBallToPaddle();
+}
+
+// Un solo gesto por evento: según la fase lanza o reinicia, nunca ambos
+function handleAction() {
+  if (state.phase === 'ready') launchBall();
+  else if (state.phase === 'won' || state.phase === 'lost') restartGame();
+}
+
 const input = { left: false, right: false, mouseX: null, last: 'keys' };
 
 const KEY_MAP = {
@@ -68,7 +84,7 @@ const KEY_MAP = {
 window.addEventListener('keydown', (e) => {
   if (e.code === 'Space') {
     e.preventDefault();
-    if (!e.repeat) launchBall();
+    if (!e.repeat) handleAction();
     return;
   }
   const dir = KEY_MAP[e.code];
@@ -90,7 +106,7 @@ canvas.addEventListener('mousemove', (e) => {
   input.last = 'mouse';
 });
 
-canvas.addEventListener('mousedown', launchBall);
+canvas.addEventListener('mousedown', handleAction);
 
 let lastTime = null;
 
@@ -128,6 +144,13 @@ function moveBall(dt) {
 
   bounceOnPaddle();
   bounceOnBricks();
+
+  if (state.bricks.every((b) => !b.alive)) {
+    ball.vx = 0;
+    ball.vy = 0;
+    state.phase = 'won';
+    return;
+  }
 
   if (ball.y - ball.radius > CANVAS.height) loseLife();
 }
@@ -208,6 +231,22 @@ function draw() {
   ctx.fill();
 
   drawHud();
+  if (state.phase === 'won' || state.phase === 'lost') drawOverlay();
+}
+
+function drawOverlay() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect(0, 0, CANVAS.width, CANVAS.height);
+
+  ctx.fillStyle = '#eee';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 48px sans-serif';
+  ctx.fillText(state.phase === 'won' ? 'Ganaste' : 'Game Over', CANVAS.width / 2, CANVAS.height / 2 - 40);
+  ctx.font = '24px sans-serif';
+  ctx.fillText(`Puntaje final: ${state.score}`, CANVAS.width / 2, CANVAS.height / 2 + 10);
+  ctx.font = '18px sans-serif';
+  ctx.fillText('Espacio o click para reiniciar', CANVAS.width / 2, CANVAS.height / 2 + 50);
 }
 
 function drawHud() {
