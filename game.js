@@ -179,6 +179,14 @@ function bounceOnBricks() {
 
     brick.alive = false;
     state.score += POINTS_PER_BRICK;
+    state.explosions.push({
+      x: brick.x,
+      y: brick.y,
+      width: brick.width,
+      height: brick.height,
+      color: brick.color,
+      elapsed: 0,
+    });
 
     // Rebota por el eje con menor penetración
     const overlapX = Math.min(ball.x + ball.radius - brick.x, brick.x + brick.width - (ball.x - ball.radius));
