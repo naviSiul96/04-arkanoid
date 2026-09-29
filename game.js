@@ -34,6 +34,7 @@ function createBricks(levelIndex) {
 const state = {
   phase: 'ready',
   level: 1, // 1..LEVELS.length
+  paused: false,
   score: 0,
   lives: INITIAL_LIVES,
   paddle: {
@@ -65,6 +66,7 @@ function restartGame() {
   state.score = 0;
   state.lives = INITIAL_LIVES;
   state.level = 1;
+  state.paused = false;
   state.bricks = createBricks(0);
   state.ball.speed = LEVELS[0].ballSpeed;
   state.explosions = [];
@@ -87,9 +89,16 @@ function nextLevel() {
 
 // Un solo gesto por evento: según la fase lanza, avanza de nivel o reinicia, nunca varios
 function handleAction() {
+  if (state.paused) return;
   if (state.phase === 'ready') launchBall();
   else if (state.phase === 'levelComplete') nextLevel();
   else if (state.phase === 'won' || state.phase === 'lost') restartGame();
+}
+
+// Solo se puede pausar en ready o playing; reanudar conserva la fase
+function togglePause() {
+  if (state.paused) state.paused = false;
+  else if (state.phase === 'ready' || state.phase === 'playing') state.paused = true;
 }
 
 const input = { left: false, right: false, mouseX: null, last: 'keys' };
@@ -105,6 +114,10 @@ window.addEventListener('keydown', (e) => {
   if (e.code === 'Space') {
     e.preventDefault();
     if (!e.repeat) handleAction();
+    return;
+  }
+  if (e.code === 'KeyP') {
+    if (!e.repeat) togglePause();
     return;
   }
   const dir = KEY_MAP[e.code];
@@ -131,6 +144,7 @@ canvas.addEventListener('mousedown', handleAction);
 let lastTime = null;
 
 function update(dt) {
+  if (state.paused) return;
   const { paddle } = state;
   if (input.last === 'mouse' && input.mouseX !== null) {
     paddle.x = input.mouseX - paddle.width / 2;
@@ -264,8 +278,22 @@ function draw() {
   drawSprite(ctx, 'ball', ball.x - ball.radius, ball.y - ball.radius, ball.radius * 2, ball.radius * 2);
 
   drawHud();
-  if (state.phase === 'levelComplete') drawLevelCompleteOverlay();
+  if (state.paused) drawPauseOverlay();
+  else if (state.phase === 'levelComplete') drawLevelCompleteOverlay();
   else if (state.phase === 'won' || state.phase === 'lost') drawOverlay();
+}
+
+function drawPauseOverlay() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect(0, 0, CANVAS.width, CANVAS.height);
+
+  ctx.fillStyle = '#eee';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 48px sans-serif';
+  ctx.fillText('Pausa', CANVAS.width / 2, CANVAS.height / 2 - 20);
+  ctx.font = '18px sans-serif';
+  ctx.fillText('P para continuar', CANVAS.width / 2, CANVAS.height / 2 + 30);
 }
 
 function drawLevelCompleteOverlay() {
