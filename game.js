@@ -9,12 +9,39 @@ const POINTS_PER_BRICK = 10;
 const INITIAL_LIVES = 3;
 const BRICK_ROW_COLORS = ['red', 'yellow', 'green', 'cyan', 'magenta']; // de arriba hacia abajo
 
-function createBricks() {
+// '#' = ladrillo, '.' = vacío; 10 columnas por fila, hasta 5 filas
+const LEVELS = [
+  { ballSpeed: 350, layout: [
+    '##########',
+    '##########',
+    '##########',
+    '##########',
+    '##########',
+  ] },
+  { ballSpeed: 400, layout: [
+    '....##....',
+    '...####...',
+    '..######..',
+    '.########.',
+    '##########',
+  ] },
+  { ballSpeed: 450, layout: [
+    '#.#.#.#.#.',
+    '.#.#.#.#.#',
+    '#.#.#.#.#.',
+    '.#.#.#.#.#',
+    '#.#.#.#.#.',
+  ] },
+];
+
+function createBricks(levelIndex) {
+  const { layout } = LEVELS[levelIndex];
   const totalWidth = BRICK.cols * BRICK.width + (BRICK.cols - 1) * BRICK.gap;
   const offsetLeft = (CANVAS.width - totalWidth) / 2;
   const bricks = [];
-  for (let row = 0; row < BRICK.rows; row++) {
+  for (let row = 0; row < layout.length; row++) {
     for (let col = 0; col < BRICK.cols; col++) {
+      if (layout[row][col] !== '#') continue;
       bricks.push({
         x: offsetLeft + col * (BRICK.width + BRICK.gap),
         y: BRICK.offsetTop + row * (BRICK.height + BRICK.gap),
@@ -30,6 +57,7 @@ function createBricks() {
 
 const state = {
   phase: 'ready',
+  level: 1, // 1..LEVELS.length
   score: 0,
   lives: INITIAL_LIVES,
   paddle: {
@@ -39,8 +67,8 @@ const state = {
     height: 14,
     speed: 600,
   },
-  ball: { x: 0, y: 0, radius: 8, vx: 0, vy: 0, speed: 350 },
-  bricks: createBricks(),
+  ball: { x: 0, y: 0, radius: 8, vx: 0, vy: 0, speed: LEVELS[0].ballSpeed },
+  bricks: createBricks(0),
   explosions: [],
 };
 
@@ -60,7 +88,9 @@ function launchBall() {
 function restartGame() {
   state.score = 0;
   state.lives = INITIAL_LIVES;
-  state.bricks = createBricks();
+  state.level = 1;
+  state.bricks = createBricks(0);
+  state.ball.speed = LEVELS[0].ballSpeed;
   state.explosions = [];
   state.ball.vx = 0;
   state.ball.vy = 0;
