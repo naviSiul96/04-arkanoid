@@ -1,6 +1,6 @@
 # SPEC 04 — Niveles y sonidos
 
-> **Estado:** Aprovado
+> **Estado:** Implementado
 > **Depende de:** SPEC 01, SPEC 02, SPEC 03
 > **Fecha:** 2026-09-29
 > **Objetivo:** Agregar 3 niveles (con pausa y selección manual de nivel para probarlos) y reproducir los sonidos existentes de `assets/sounds/` al rebotar y al romper ladrillos.
