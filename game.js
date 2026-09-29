@@ -49,6 +49,18 @@ const state = {
   explosions: [],
 };
 
+const SOUND_FILES = {
+  bounce: 'assets/sounds/ball-bounce.mp3',
+  break: 'assets/sounds/break-sound.mp3',
+};
+const sounds = {};
+
+// Reproduce un clon por disparo para permitir sonidos solapados
+function playSound(name) {
+  if (!sounds[name]) sounds[name] = new Audio(SOUND_FILES[name]);
+  sounds[name].cloneNode().play().catch(() => {});
+}
+
 function stickBallToPaddle() {
   const { paddle, ball } = state;
   ball.x = paddle.x + paddle.width / 2;
@@ -226,6 +238,7 @@ function bounceOnBricks() {
 
     brick.alive = false;
     state.score += POINTS_PER_BRICK;
+    playSound('break');
     state.explosions.push({
       x: brick.x,
       y: brick.y,
